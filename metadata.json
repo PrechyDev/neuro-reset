@@ -1,0 +1,8 @@
+{
+  "name": "NeuroReset",
+  "description": "An intuitive wellness assistant designed for neurodivergent young adults to overcome mental roadblocks, overwhelm, and task inertia.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
