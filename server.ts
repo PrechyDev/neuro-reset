@@ -75,26 +75,54 @@ You must return your response conforming strictly to this JSON schema:
 }
 `;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3.5-flash",
-        contents: prompt,
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              title: { type: Type.STRING },
-              intervention: { type: Type.STRING },
-              whyItWorks: { type: Type.STRING },
-              then: { type: Type.STRING },
-              category: { type: Type.STRING },
-              durationSeconds: { type: Type.INTEGER }
+      let response;
+      try {
+        console.log("Attempting generation using gemini-3.5-flash...");
+        response = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: prompt,
+          config: {
+            temperature: 0.2,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                title: { type: Type.STRING },
+                intervention: { type: Type.STRING },
+                whyItWorks: { type: Type.STRING },
+                then: { type: Type.STRING },
+                category: { type: Type.STRING },
+                durationSeconds: { type: Type.INTEGER }
+              },
+              required: ["title", "intervention", "whyItWorks", "then", "category", "durationSeconds"]
             },
-            required: ["title", "intervention", "whyItWorks", "then", "category", "durationSeconds"]
-          },
-          systemInstruction: "You are a neurodivergent focus coach and empathetic peer named NeuroReset. You tailor realistic, quick 2-10 min offline interventions specifically for young Nigerian adults with ADHD, sensory sensitivity, or autistic inertia, using peer-friendly, realistic language and clinical coping strategies."
-        }
-      });
+            systemInstruction: "You are a neurodivergent focus coach and empathetic peer named NeuroReset. You tailor realistic, quick 2-10 min offline interventions specifically for young Nigerian adults with ADHD, sensory sensitivity, or autistic inertia, using peer-friendly, realistic language and clinical coping strategies."
+          }
+        });
+      } catch (geminiError: any) {
+        console.warn("Primary model gemini-3.5-flash failed or quota exceeded. Falling back to gemini-3.1-flash-lite. Error was:", geminiError.message || geminiError);
+        response = await ai.models.generateContent({
+          model: "gemini-3.1-flash-lite",
+          contents: prompt,
+          config: {
+            temperature: 0.2,
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                title: { type: Type.STRING },
+                intervention: { type: Type.STRING },
+                whyItWorks: { type: Type.STRING },
+                then: { type: Type.STRING },
+                category: { type: Type.STRING },
+                durationSeconds: { type: Type.INTEGER }
+              },
+              required: ["title", "intervention", "whyItWorks", "then", "category", "durationSeconds"]
+            },
+            systemInstruction: "You are a neurodivergent focus coach and empathetic peer named NeuroReset. You tailor realistic, quick 2-10 min offline interventions specifically for young Nigerian adults with ADHD, sensory sensitivity, or autistic inertia, using peer-friendly, realistic language and clinical coping strategies."
+          }
+        });
+      }
 
       const text = response.text;
       if (!text) {
