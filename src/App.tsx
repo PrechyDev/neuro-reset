@@ -563,8 +563,8 @@ export default function App() {
           )}
 
           {/* STATE 3: Real-time generated active reset matching layout requested */}
-          {!loading && result && (
-            <div className={`bg-gradient-to-b ${getCategoryColor(result.category)} border rounded-2xl p-5 sm:p-6 shadow-lg flex flex-col gap-5 min-h-[500px] transition-all duration-300`}>
+          {!loading && result && !isTimerCompleted && (
+            <div className={`bg-gradient-to-b ${getCategoryColor(result.category)} border rounded-2xl p-5 sm:p-6 shadow-lg flex flex-col gap-5 min-h-[500px] transition-all duration-300 animate-fade-in`}>
               
               {/* Back to input navigation bar */}
               <div className="flex items-center justify-between border-b border-orange-500/10 pb-4">
@@ -575,7 +575,7 @@ export default function App() {
                     setIsTimerCompleted(false);
                     setTimerActive(false);
                   }}
-                  className="flex items-center gap-2 text-xs font-mono text-slate-300 hover:text-orange-400 hover:border-orange-500/30 transition-all font-semibold py-1.5 px-3 rounded-lg bg-slate-950 border border-slate-800 shadow"
+                  className="flex items-center gap-2 text-xs font-mono text-slate-300 hover:text-orange-400 hover:border-orange-500/30 transition-all font-semibold py-1.5 px-3 rounded-lg bg-slate-950 border border-slate-800 shadow cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 text-orange-400" /> Back to Customizer
                 </button>
@@ -598,29 +598,22 @@ export default function App() {
 
               {/* Structured text content */}
               <div className="flex flex-col gap-4 text-sm leading-relaxed text-slate-200">
-                <div id="intervention-text" className="p-4 bg-slate-950 border border-slate-800/85 rounded-xl shadow-inner">
+                <div id="intervention-text" className="p-4 bg-slate-950 border border-slate-800/85 rounded-xl shadow-inner animate-fade-in">
                   <p className="font-bold text-orange-400 mb-1 font-mono text-xs tracking-wider">DO THIS NOW</p>
                   <p className="font-sans text-slate-100 text-sm leading-relaxed">
                     {result.intervention.replace(/^Do this now:\s*/i, "")}
                   </p>
                 </div>
 
-                <div id="why-text">
+                <div id="why-text" className="bg-slate-950/20 p-3.5 rounded-xl border border-slate-800/10">
                   <span className="font-bold text-xs text-orange-400 font-mono tracking-wider block mb-0.5">WHY IT WORKS</span>
                   <p className="text-xs text-slate-300 italic">
                     {result.whyItWorks.replace(/^Why it works:\s*/i, "")}
                   </p>
                 </div>
-
-                <div id="then-text" className="border-t border-slate-800/40 pt-4">
-                  <span className="font-bold text-xs text-orange-400 font-mono tracking-wider block mb-0.5">THEN</span>
-                  <p className="font-sans font-medium text-slate-200 text-sm leading-relaxed">
-                    {result.then.replace(/^Then:\s*/i, "")}
-                  </p>
-                </div>
               </div>
 
-              {/* Interactive stopwatch and sound controls */}
+              {/* Interactive stopwatch and sound controls - now comes right after internal blocks! */}
               <div className="mt-auto bg-slate-950 border border-slate-900 rounded-xl p-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <div>
@@ -635,7 +628,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setIsMuted(!isMuted)}
-                      className={`p-2 rounded-xl border transition-all ${
+                      className={`p-2 rounded-xl border transition-all cursor-pointer ${
                         isMuted 
                           ? "bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300" 
                           : "bg-orange-500/10 border-orange-500/20 text-orange-300 hover:bg-orange-500/20"
@@ -648,7 +641,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={toggleTimer}
-                      className={`p-2 rounded-xl border transition-all ${
+                      className={`p-2 rounded-xl border transition-all cursor-pointer ${
                         timerActive 
                           ? "bg-amber-500/15 border-amber-500/30 text-amber-300 hover:bg-amber-500/20" 
                           : "bg-orange-500/10 border-orange-500/30 text-orange-400 hover:bg-orange-500/20"
@@ -661,7 +654,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => resetTimer(result.durationSeconds || 120)}
-                      className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-200 transition-all"
+                      className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:bg-slate-805 hover:text-slate-200 transition-all cursor-pointer"
                       title="Reset Timer"
                     >
                       <RotateCcw className="w-4 h-4" />
@@ -679,13 +672,89 @@ export default function App() {
                   />
                 </div>
 
-                {/* Completed Banner */}
-                {isTimerCompleted && (
-                  <div className="bg-emerald-500/10 border border-emerald-500/30 p-2.5 text-emerald-300 text-xs rounded-lg flex items-center gap-2 animate-bounce">
-                    <CheckCircle className="w-4 h-4 shrink-0 text-emerald-400" />
-                    <span>Great job on resetting! Transition back to your task gently now.</span>
-                  </div>
-                )}
+                <div className="border-t border-slate-900/40 pt-2 flex items-center justify-between">
+                  <span className="text-[10px] text-slate-500 font-sans italic">Ready earlier? Tap finish whenever you are regulated.</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTimerActive(false);
+                      setIsTimerCompleted(true);
+                      playCompleteSound();
+                    }}
+                    className="text-[11px] font-mono text-orange-400 hover:text-orange-300 font-bold hover:underline transition-all cursor-pointer"
+                  >
+                    Finish Early &rarr;
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* STATE 4: Done Frame with congratulatory message and "Then" transition guide */}
+          {!loading && result && isTimerCompleted && (
+            <div className={`bg-gradient-to-b ${getCategoryColor(result.category)} border rounded-2xl p-5 sm:p-6 shadow-lg flex flex-col gap-5 min-h-[500px] transition-all duration-300 animate-fade-in`}>
+              
+              {/* Reset bar indicator */}
+              <div className="flex items-center justify-between border-b border-orange-500/10 pb-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResult(null);
+                    setIsTimerCompleted(false);
+                    setTimerActive(false);
+                  }}
+                  className="flex items-center gap-2 text-xs font-mono text-slate-300 hover:text-orange-400 hover:border-orange-500/30 transition-all font-semibold py-1.5 px-3 rounded-lg bg-slate-950 border border-slate-800 shadow cursor-pointer"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 text-orange-400" /> Start Over
+                </button>
+                <span className="text-[11px] font-mono text-emerald-400 bg-slate-950/80 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1 font-bold shadow-sm">
+                  <CheckCircle className="w-3.5 h-3.5 text-emerald-400" /> NeuroReset Complete
+                </span>
+              </div>
+
+              {/* Congratulations message or something to say well done */}
+              <div className="text-center py-6 flex flex-col items-center gap-3 animate-fade-in">
+                <div className="w-14 h-14 bg-emerald-500/10 border border-emerald-500/30 rounded-full flex items-center justify-center text-emerald-400 animate-pulse shadow-glow">
+                  <CheckCircle className="w-7 h-7" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-display font-extrabold text-xl sm:text-2xl text-slate-100 tracking-tight leading-snug">
+                    Well done resetting! ⚡
+                  </h3>
+                  <p className="text-xs font-mono text-orange-300 uppercase tracking-widest font-semibold">
+                    No gree for executive dysfunction.
+                  </p>
+                </div>
+              </div>
+
+              {/* The "Then" block comes here! */}
+              <div id="then-frame" className="p-5 bg-slate-950 border border-slate-850 rounded-xl shadow-inner flex flex-col gap-2.5 animate-fade-in">
+                <span className="font-bold text-[10px] text-orange-400 font-mono tracking-widest block uppercase">
+                  YOUR TRANSITION BACK TO: "{inputs.task || 'Your Task'}"
+                </span>
+                <p className="font-sans text-slate-100 text-sm leading-relaxed font-semibold">
+                  {result.then.replace(/^Then:\s*/i, "")}
+                </p>
+              </div>
+
+              <div className="mt-auto flex flex-col gap-3">
+                {/* Big, beautiful confirmation button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setResult(null);
+                    setIsTimerCompleted(false);
+                    setTimerActive(false);
+                  }}
+                  className="w-full font-display font-bold text-sm bg-orange-600 hover:bg-orange-500 text-white shadow-md hover:shadow-orange-700/20 px-4 py-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>I'm Ready, Let's Work! 🙌</span>
+                </button>
+                
+                <p className="text-[10px] text-center text-slate-500 font-mono leading-relaxed">
+                  Take a calm breath and start with microscopic steps. You've got this.
+                </p>
               </div>
 
             </div>

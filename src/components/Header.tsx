@@ -10,7 +10,7 @@ export default function Header() {
         </div>
         <div>
           <h1 className="font-display font-bold text-xl text-slate-100 tracking-tight flex items-center gap-2">
-            NeuroReset <span className="text-xs font-mono font-medium text-orange-400 px-2 py-0.5 rounded-full bg-orange-500/10">v2.0</span>
+            NeuroReset <span className="text-xs font-mono font-medium text-orange-400 px-2 py-0.5 rounded-full bg-orange-500/10">v1.0</span>
           </h1>
           <p className="text-xs text-slate-400 font-sans">
             Warm, evidence-grounded micro-resets to break executive dysfunction and task inertia
